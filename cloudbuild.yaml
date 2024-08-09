@@ -4,6 +4,7 @@ steps:
   args:
   - '-c'
   - |
+    echo $GOOGLE_CLOUD_CREDENTIALS | base64 --decode > /workspace/service-account.json
     python3 -m venv venv
     . venv/bin/activate
     pip install -r requirements.txt
@@ -17,6 +18,10 @@ images:
   - 'gcr.io/$PROJECT_ID/django-app'
 
 timeout: '1600s'
+
+secrets:
+- secretEnv:
+    GOOGLE_CLOUD_CREDENTIALS: projects/andong-24-team-101/secrets/service-account/versions/latest
 
 # service_account 필드는 최상위 레벨에 있어야 합니다.
 service_account: 535442247184-compute@developer.gserviceaccount.com
