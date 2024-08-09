@@ -7,6 +7,8 @@ images:
 
 timeout: '1600s'
 
+# service_account 필드는 최상위 레벨에 있어야 합니다.
+service_account: 535442247184-compute@developer.gserviceaccount.com
+
 options:
   logging: CLOUD_LOGGING_ONLY  # 로그를 Cloud Logging에만 저장
-  service_account: 535442247184-compute@developer.gserviceaccount.com
