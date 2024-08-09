@@ -1,5 +1,5 @@
 # 특정 파일 무시
-Secret-key.json
+service-account-key.json
 
 .idea/
 

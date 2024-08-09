@@ -66,7 +66,7 @@ GS_BUCKET_NAME = 'test_music_team_101'
 
 # 서비스 계정 키 파일 경로 수정
 GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-    os.path.join(BASE_DIR, 'Secret-key.json')
+    os.path.join(BASE_DIR, 'service-account-key.json')
 )
 
 MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
