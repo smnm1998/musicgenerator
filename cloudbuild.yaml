@@ -17,18 +17,14 @@ steps:
     # 정적 파일 수집
     python manage.py collectstatic --noinput
 
-
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy']
-
-images:
-  - 'gcr.io/$PROJECT_ID/django-app'
 
 timeout: '1600s'
 
 secrets:
 - secretEnv:
-    GOOGLE_CLOUD_CREDENTIALS: projects/andong-24-team-101/secrets/service-account/versions/latest
+    GOOGLE_CLOUD_CREDENTIALS: projects/andong-24-team-101/secrets/service-account-key/versions/latest
 
 service_account: 535442247184-compute@developer.gserviceaccount.com
 
