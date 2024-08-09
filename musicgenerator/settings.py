@@ -18,6 +18,9 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# # 프로젝트 루트 디렉터리 경로
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -60,9 +63,12 @@ ROOT_URLCONF = 'musicgenerator.urls'
 # Google Cloud Storage 설정
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 GS_BUCKET_NAME = 'test_music_team_101'
+
+# 서비스 계정 키 파일 경로 수정
 GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-    os.path.join(BASE_DIR, '.andong-24-team-101-29f9287c2d38.json')
+    os.path.join(BASE_DIR, 'andong-24-team-101-29f9287c2d38.json')
 )
+
 MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
 
 
