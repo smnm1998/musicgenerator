@@ -1,9 +1,7 @@
-# music/forms.py
-
 from django import forms
-from .models import ImageUpload
+from .models import UploadedImage
 
 class ImageUploadForm(forms.ModelForm):
     class Meta:
-        model = ImageUpload
+        model = UploadedImage
         fields = ['image']

@@ -1,7 +1,5 @@
-# music/models.py
-
 from django.db import models
 
-class ImageUpload(models.Model):
+class UploadedImage(models.Model):
     image = models.ImageField(upload_to='images/')
-    created_at = models.DateTimeField(auto_now_add=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
