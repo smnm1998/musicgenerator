@@ -4,11 +4,21 @@ steps:
   args:
   - '-c'
   - |
+    # Secret Manager에서 가져온 서비스 계정 키를 파일로 저장
     echo "$GOOGLE_CLOUD_CREDENTIALS" > /workspace/service-account.json
+    
+    # 가상환경 생성 및 활성화
     python3 -m venv venv
     . venv/bin/activate
+    
+    # 필요한 패키지 설치
     pip install -r requirements.txt
+    
+    # 정적 파일 수집
     python manage.py collectstatic --noinput
+    
+    # 데이터베이스 마이그레이션
+    python manage.py migrate
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy']
@@ -17,9 +27,9 @@ timeout: '1600s'
 
 secrets:
 - secretEnv:
-    GOOGLE_CLOUD_CREDENTIALS: projects/andong-24-team-101/secrets/new-service-account-key/versions/latest
+    GOOGLE_CLOUD_CREDENTIALS: projects/andong-24-team-101/secrets/service-account-key/versions/latest
 
 service_account: 535442247184-compute@developer.gserviceaccount.com
 
 options:
-  logging: CLOUD_LOGGING_ONLY  # 로그를 Cloud Logging에만 저장
+  logging: CLOUD_LOGGING_ONLY
