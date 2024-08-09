@@ -4,7 +4,7 @@ steps:
   args:
   - '-c'
   - |
-    echo $GOOGLE_CLOUD_CREDENTIALS > /workspace/service-account.json
+    echo "$GOOGLE_CLOUD_CREDENTIALS" > /workspace/service-account.json
     python3 -m venv venv
     . venv/bin/activate
     pip install -r requirements.txt
