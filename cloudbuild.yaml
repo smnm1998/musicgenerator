@@ -6,3 +6,7 @@ images:
   - 'gcr.io/$PROJECT_ID/django-app'
 
 timeout: '1600s'
+
+options:
+  logging: CLOUD_LOGGING_ONLY  # 로그를 Cloud Logging에만 저장
+  service_account: 535442247184-compute@developer.gserviceaccount.com
