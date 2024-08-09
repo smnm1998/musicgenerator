@@ -1,25 +1,32 @@
-steps:
-- name: 'python'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    echo "$GOOGLE_CLOUD_CREDENTIALS" > /workspace/service-account.json
-    python3 -m venv venv
-    . venv/bin/activate
-    pip install -r requirements.txt
-    python manage.py collectstatic --noinput
+#steps:
+#- name: 'python'
+#  entrypoint: 'bash'
+#  args:
+#  - '-c'
+#  - |
+#    echo "$GOOGLE_CLOUD_CREDENTIALS" > /workspace/service-account.json
+#    python3 -m venv venv
+#    . venv/bin/activate
+#    pip install -r requirements.txt
+#    python manage.py collectstatic --noinput
+#
+#- name: 'gcr.io/cloud-builders/gcloud'
+#  args: ['app', 'deploy']
+#
+#timeout: '1600s'
+#
+#secrets:
+#- secretEnv:
+#    GOOGLE_CLOUD_CREDENTIALS: projects/andong-24-team-101/secrets/new-service-account-key/versions/latest
+#
+#service_account: 535442247184-compute@developer.gserviceaccount.com
+#
+#options:
+#  logging: CLOUD_LOGGING_ONLY  # 로그를 Cloud Logging에만 저장
 
+
+steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy']
 
 timeout: '1600s'
-
-secrets:
-- secretEnv:
-    GOOGLE_CLOUD_CREDENTIALS: projects/andong-24-team-101/secrets/new-service-account-key/versions/latest
-
-service_account: 535442247184-compute@developer.gserviceaccount.com
-
-options:
-  logging: CLOUD_LOGGING_ONLY  # 로그를 Cloud Logging에만 저장
