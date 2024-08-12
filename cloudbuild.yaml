@@ -22,7 +22,7 @@ steps:
 
 secrets:
 - secretEnv:
-    GOOGLE_CLOUD_CREDENTIALS: projects/andong-24-team-101/secrets/service-account-key/versions/latest
+    GOOGLE_CLOUD_CREDENTIALS: projects/535442247184/secrets/service-account-key/versions/latest
 
 service_account: 535442247184-compute@developer.gserviceaccount.com
 
