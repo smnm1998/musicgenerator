@@ -25,9 +25,10 @@ service_account: 535442247184-compute@developer.gserviceaccount.com
 
 options:
   logging: CLOUD_LOGGING_ONLY
-  machineType: 'E2_STANDARD'
+  machineType: 'E2_MEDIUM'
 
 # 이거 안돼면 gcp inline으로 작성하기
-# E2_HIGHCPU_8: 이 머신 유형은 CPU 중심의 작업에 적합합니다.
-# E2_STANDARD: 일반적인 컴퓨팅 작업에 적합합니다.
-# E2_HIGHMEM: 메모리 중심의 작업에 적합합니다.
+#	•	E2_SMALL
+#	•	E2_MEDIUM
+#	•	N1_HIGHCPU_8
+#	•	N1_HIGHCPU_32
