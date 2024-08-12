@@ -1,44 +1,43 @@
 steps:
+  # Step 1: gcloud 이미지에서 비밀을 가져옴
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Starting Secret Manager access..."
+        gcloud secrets versions access latest --secret="service-account-key" > /workspace/service-account-key.json
+        echo "Secret Manager access completed."
+
+  # Step 2: Python 환경에서 작업 수행
   - name: 'python:3.11'
     entrypoint: 'bash'
     args:
-    - '-c'
-    - |
-      #!/bin/bash
+      - '-c'
+      - |
+        echo "Creating virtual environment..."
+        python3 -m venv venv
+        . venv/bin/activate
+        
+        echo "Installing dependencies..."
+        pip install -r requirements.txt || exit 1
+        
+        echo "Collecting static files..."
+        python manage.py collectstatic --noinput || exit 1
+        
+        echo "Applying migrations..."
+        python manage.py migrate || exit 1
 
-      # Secret Manager에서 비밀을 가져옴
-      echo "Starting Secret Manager access..."
-      gcloud secrets versions access latest --secret="service-account-key" > /workspace/service-account-key.json || exit 1
-      echo "Secret Manager access completed."
-      
-      # 가상환경 생성 및 활성화
-      echo "Creating virtual environment..."
-      python3 -m venv venv || exit 1
-      . venv/bin/activate
-      
-      # 필요한 패키지 설치
-      echo "Installing dependencies..."
-      pip install -r requirements.txt || exit 1
-      
-      # 정적 파일 수집
-      echo "Collecting static files..."
-      python manage.py collectstatic --noinput || exit 1
-      
-      # 데이터베이스 마이그레이션 적용
-      echo "Applying migrations..."
-      python manage.py migrate || exit 1
-
+  # Step 3: GCP에 배포
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
+
+secrets:
+- secretEnv:
+    GOOGLE_CLOUD_CREDENTIALS: projects/535442247184/secrets/service-account-key/versions/latest
 
 service_account: 535442247184-compute@developer.gserviceaccount.com
 
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: 'E2_MEDIUM'
-
-# 이거 안돼면 gcp inline으로 작성하기
-#	•	E2_SMALL
-#	•	E2_MEDIUM
-#	•	N1_HIGHCPU_8
-#	•	N1_HIGHCPU_32
