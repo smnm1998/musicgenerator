@@ -7,8 +7,9 @@ steps:
       # Secret Manager에서 가져온 비밀을 파일로 저장
       echo "$GOOGLE_CLOUD_CREDENTIALS" > /workspace/service-account-key.json
       
-      # 환경 변수를 출력하여 디버그 (디버깅 목적, 완료 후 제거)
-      echo "$GOOGLE_CLOUD_CREDENTIALS"
+      # 환경 변수를 출력하여 디버그 (디버깅 목적)
+      echo "Decoded GOOGLE_CLOUD_CREDENTIALS:"
+      cat /workspace/service-account-key.json
       
       # 가상환경 생성 및 활성화
       python3 -m venv venv
