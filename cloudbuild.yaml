@@ -4,10 +4,15 @@ steps:
     args:
     - '-c'
     - |
-      # Secret Manager에서 가져온 비밀을 Base64로 디코딩하여 파일로 저장
+      # Secret Manager에서 가져온 비밀을 디코딩하지 않고 출력하여 원본을 확인
+      echo "Original Base64 Encoded GOOGLE_CLOUD_CREDENTIALS:"
+      echo "$GOOGLE_CLOUD_CREDENTIALS"
+      
+      # Base64로 디코딩하여 파일로 저장
       echo "$GOOGLE_CLOUD_CREDENTIALS" | base64 --decode > /workspace/service-account-key.json
       
-      # 디버그: 환경 변수를 출력하여 확인 (완료 후 제거)
+      # 디코딩된 파일의 내용을 확인
+      echo "Decoded service-account-key.json:"
       cat /workspace/service-account-key.json
       
       # 가상환경 생성 및 활성화
