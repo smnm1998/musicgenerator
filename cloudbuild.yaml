@@ -4,16 +4,8 @@ steps:
     args:
     - '-c'
     - |
-      # Secret Manager에서 가져온 비밀을 디코딩하지 않고 출력하여 원본을 확인
-      echo "Original Base64 Encoded GOOGLE_CLOUD_CREDENTIALS:"
-      echo "$GOOGLE_CLOUD_CREDENTIALS"
-      
-      # Base64로 디코딩하여 파일로 저장
-      echo "$GOOGLE_CLOUD_CREDENTIALS" | base64 --decode > /workspace/service-account-key.json
-      
-      # 디코딩된 파일의 내용을 확인
-      echo "Decoded service-account-key.json:"
-      cat /workspace/service-account-key.json
+      # Secret Manager에서 가져온 비밀을 파일로 저장
+      gcloud secrets versions access latest --secret="service-account-key" > /workspace/service-account-key.json
       
       # 가상환경 생성 및 활성화
       python3 -m venv venv
@@ -29,12 +21,13 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
 
-secrets:
-- secretEnv:
-    GOOGLE_CLOUD_CREDENTIALS: projects/535442247184/secrets/service-account-key/versions/latest
-
 service_account: 535442247184-compute@developer.gserviceaccount.com
 
 options:
   logging: CLOUD_LOGGING_ONLY
-  machineType: 'N1_HIGHCPU_8'
+  machineType: 'E2_STANDARD'
+
+# 이거 안돼면 gcp inline으로 작성하기
+# E2_HIGHCPU_8: 이 머신 유형은 CPU 중심의 작업에 적합합니다.
+# E2_STANDARD: 일반적인 컴퓨팅 작업에 적합합니다.
+# E2_HIGHMEM: 메모리 중심의 작업에 적합합니다.
