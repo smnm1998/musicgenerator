@@ -1,35 +1,38 @@
 steps:
-- name: 'python'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    # Secret Manager에서 가져온 서비스 계정 키를 파일로 저장
-    echo "$GOOGLE_CLOUD_CREDENTIALS" > /workspace/service-account.json
-    
-    # 가상환경 생성 및 활성화
-    python3 -m venv venv
-    . venv/bin/activate
-    
-    # 필요한 패키지 설치
-    pip install -r requirements.txt
-    
-    # 정적 파일 수집
-    python manage.py collectstatic --noinput
-    
-    # 데이터베이스 마이그레이션
-    python manage.py migrate
+  # 1. Python 가상환경 설정 및 필요 패키지 설치
+  - name: 'python:3.10'  # Python 3.10 이미지를 사용
+    entrypoint: 'bash'
+    args:
+    - '-c'
+    - |
+      # Secret Manager에서 가져온 비밀을 파일로 저장
+      echo "$GOOGLE_CLOUD_CREDENTIALS" > /workspace/service-account-key.json
+      
+      # 가상환경 생성 및 활성화
+      python3 -m venv venv
+      . venv/bin/activate
+      
+      # 필요한 패키지 설치
+      pip install -r requirements.txt
+      
+      # 정적 파일 수집 및 마이그레이션
+      python manage.py collectstatic --noinput
+      python manage.py migrate
 
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy']
+  # 2. GCP에 애플리케이션 배포
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['app', 'deploy']
 
-timeout: '1600s'
-
+# Secret Manager에서 가져온 비밀을 환경 변수로 설정
 secrets:
 - secretEnv:
     GOOGLE_CLOUD_CREDENTIALS: projects/andong-24-team-101/secrets/service-account-key/versions/latest
 
+# Cloud Build가 사용하는 서비스 계정 설정
 service_account: 535442247184-compute@developer.gserviceaccount.com
 
+# 추가적인 옵션 설정
 options:
-  logging: CLOUD_LOGGING_ONLY
+  logging: CLOUD_LOGGING_ONLY  # 로그를 Cloud Logging에만 저장
+#  machineType: 'N1_HIGHCPU_8'  # 빌드에 사용될 머신 유형
+  timeout: '1600s'  # 빌드 시간 제한 설정
