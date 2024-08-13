@@ -56,3 +56,5 @@ steps:
 
 images:
   - 'gcr.io/$PROJECT_ID/django-app'
+
+logging: CLOUD_LOGGING_ONLY
