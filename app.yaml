@@ -1,9 +1,0 @@
-runtime: python310  # 사용하는 Python 버전
-entrypoint: gunicorn -b :$PORT musicgenerator.wsgi  # WSGI 설정 (프로젝트 이름에 맞게 수정)
-
-handlers:
-- url: /static
-  static_dir: staticfiles/  # STATIC_ROOT에 설정된 디렉터리
-
-- url: /.*
-  script: auto
