@@ -4,8 +4,9 @@ FROM python:3.11.9-slim
 # 작업 디렉터리를 설정합니다.
 WORKDIR /app
 
-# 필요한 시스템 패키지를 설치합니다.
-RUN apt-get update && apt-get install -y \
+# 필요한 시스템 패키지 설치 (기본적인 빌드 도구)
+RUN apt-get update && \
+    apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
@@ -18,3 +19,10 @@ COPY . .
 
 # gunicorn을 사용하여 Django 앱 실행
 CMD ["gunicorn", "--bind", "0.0.0.0:8080", "musicgenerator.wsgi:application"]
+
+## 환경 변수 설정 (포트 설정)
+#ENV PORT=8080
+#
+## 애플리케이션 실행
+#CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "musicgenerator.wsgi:application"]
+
