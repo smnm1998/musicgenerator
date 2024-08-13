@@ -16,5 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 애플리케이션 소스 코드를 복사합니다.
 COPY . .
 
-# Gunicorn을 사용하여 Django 애플리케이션을 실행합니다.
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "musicgenerator.wsgi"]
+ENV PORT=8080
+
+# gunicorn을 사용하여 Django 앱 실행
+CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "musicgenerator.wsgi:application"]
