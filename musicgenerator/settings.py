@@ -16,7 +16,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-s0o2jzdy#nizj)c3(j*2bs#bzc_2a5c@fq+3%g3yw_()t6p@in'
+# SECRET_KEY = 'django-insecure-s0o2jzdy#nizj)c3(j*2bs#bzc_2a5c@fq+3%g3yw_()t6p@in'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -51,7 +53,8 @@ ROOT_URLCONF = 'musicgenerator.urls'
 
 # Google Cloud Storage 설정
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-GS_BUCKET_NAME = 'test_music_team_101'
+# GS_BUCKET_NAME = 'test_music_team_101'
+GS_BUCKET_NAME = os.environ.get('GS_BUCKET_NAME', 'default-bucket-name')
 MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
 
 # 로컬 환경에서는 서비스 계정 키 파일 사용
