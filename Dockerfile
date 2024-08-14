@@ -26,3 +26,4 @@ CMD ["gunicorn", "--bind", "0.0.0.0:8080", "musicgenerator.wsgi:application"]
 ## 애플리케이션 실행
 #CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "musicgenerator.wsgi:application"]
 
+
