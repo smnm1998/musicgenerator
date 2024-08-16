@@ -1,0 +1,11 @@
+@import url('https://fastly.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css');
+
+body {
+    margin: 0 auto;
+    background-color: #F5F5F5;
+    font-family: galmuri9, Arial, Helvetica, sans-serif;
+}
+
+button {
+    font-family: galmuri9, Arial, Helvetica, sans-serif;
+}

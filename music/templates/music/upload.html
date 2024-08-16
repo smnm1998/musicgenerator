@@ -1,16 +1,77 @@
-<!-- templates/upload.html -->
-
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-    <title>Image Upload</title>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Main</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'music/css/app.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'music/css/upload.css' %}">
 </head>
 <body>
-    <h1>Upload an Image</h1>
-    <form method="post" enctype="multipart/form-data">
+    <div class="header-container">
+        <header>
+            <div class="header-wrapper">
+                <a href="#">
+                    <img src="{% static 'music/images/gcp_logo.svg' %}" alt="logo">
+                </a>
+            </div>
+        </header>
+    </div>
+        <div>
+        <div class="introduce-container">
+            <h1>소개</h1>
+            <p>이미지를 업로드하여 자신만의 앨범을 만들어보세요!</p>
+        </div>
+    </div>
+    <div class="photo-preview-container">
+        <div class="photo-preview-wrapper">
+            <p id="preview-text">사진 미리보기</p>
+            <img id="preview-image" src="" alt="사진 미리보기">
+        </div>
+    </div>
+    <form method="post" enctype="multipart/form-data" id="upload-form">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Upload</button>
+        <div class="photo-upload-button">
+            <label for="file-upload" class="custom-file-upload" id="select-button">
+                사진 선택하기
+            </label>
+            <input id="file-upload" name="file-upload" type="file" accept="image/*" style="display: none;" />
+        </div>
     </form>
+    <div id="action-buttons" style="text-align: center; margin-top: 20px;"></div>
+    <div>
+        <div class="introduce-container">
+            <h1>앨범아트</h1>
+            <p>분위기에 맞는 앨범아트를 맞춤형으로 생성해드립니다!</p>
+        </div>
+        <div class="introduce-container">
+            <h1>노래</h1>
+            <p>자신에게 어울리는 노래를 감상해보세요!</p>
+        </div>
+        <div class="introduce-container">
+            <h1>가사</h1>
+            <p>노래를 감상하며 가사도 한 번 읽어보세요!</p>
+        </div>
+    </div>
+    <div class="footer-container">
+        <footer>
+            <p>
+                Google
+                <span class="footer-span-1">
+                    Cloud
+                </span>
+                <span class="footer-span-2">
+                    Platform
+                </span><br>
+                <span>
+                    Andong National University
+                </span>
+            </p>
+        </footer>
+    </div>
+<script src="{% static 'music/js/upload.js' %}"></script>
 </body>
 </html>

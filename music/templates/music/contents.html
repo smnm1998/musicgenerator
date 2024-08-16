@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en&ko-KR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contents</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'music/css/app.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'music/css/contents.css' %}">
+</head>
+<body>
+    <div class="header-container">
+        <header>
+            <div class="header-wrapper">
+                <a href="#">
+                    <img src="../style/assets/gcp_logo.svg" alt="logo">
+                </a>
+            </div>
+        </header>
+    </div>
+
+    <div>
+        <div class="introduce-container">
+            <h1>앨범아트</h1>
+        </div>
+    </div>
+
+    <div class="albumart-container">
+        <div class="albumart-wrapper">
+            <img id="albumart-image" src="" alt="앨범아트">
+        </div>
+    </div>
+
+    <div>
+        <div class="introduce-container">
+            <h1>노래</h1>
+        </div>
+    </div>
+
+    <!-- Audio player -->
+    <div class="audio-player-container">
+        <audio id="audio-player" controls>
+            <source src="../media/song.mp3" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <div>
+        <div class="introduce-container">
+            <h1>가사</h1>
+        </div>
+    </div>
+
+    <!-- Lyrics section -->
+    <div class="lyrics-container">
+        <div class="lyrics-wrapper">
+            <p id="lyrics-content">
+                여기에 가사가 표시됩니다.
+            </p>
+        </div>
+    </div>
+
+    <div class="introduce-container">
+        <h1>평가</h1>
+        <p>마음에 드셨다면 공유 부탁드립니다!</p>
+    </div>
+
+    <div class="footer-container">
+        <footer>
+            <p>
+                Google
+                <span class="footer-span-1">
+                    Cloud
+                </span>
+                <span class="footer-span-2">
+                    Platform
+                </span><br>
+                <span>
+                    Andong National University
+                </span>
+            </p>
+        </footer>
+    </div>
+    <script src="{% static 'music/js/contents.js' %}"></script>
+</body>
+</html>
