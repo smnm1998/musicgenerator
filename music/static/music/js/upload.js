@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
             selectButton.style.display = 'none';
 
             // 업로드 및 다시 선택하기 버튼 추가
-            const actionButtons = document.getElementById('action-buttons');
+            const actionButtons = document.getElementById('file-upload');
             actionButtons.innerHTML = `
                 <button class="button" id="upload-button">업로드하기</button>
                 <button class="button" id="reselect-button">다시 선택하기</button>
@@ -32,8 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 업로드하기 버튼 클릭 시
             document.getElementById('upload-button').addEventListener('click', function() {
-                // 로딩 페이지로 이동
-                window.location.href = "{% url 'loading_page' %}";
+                document.getElementById('upload-form').submit();  // 폼 제출
             });
         };
 
