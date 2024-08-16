@@ -54,7 +54,7 @@ ROOT_URLCONF = 'musicgenerator.urls'
 # Google Cloud Storage 설정
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 # GS_BUCKET_NAME = 'test_music_team_101'
-GS_BUCKET_NAME = os.environ.get('GS_BUCKET_NAME', 'default-bucket-name')
+GS_BUCKET_NAME = os.environ.get('GS_BUCKET_NAME', 'test_music_team_101')
 MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
 
 # 로컬 환경에서는 서비스 계정 키 파일 사용
