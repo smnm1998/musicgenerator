@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
             selectButton.style.display = 'none';
 
             // 업로드 및 다시 선택하기 버튼 추가
-            const actionButtons = document.getElementById('file-upload');
+            const actionButtons = document.getElementById('action-buttons');
             actionButtons.innerHTML = `
                 <button class="button" id="upload-button">업로드하기</button>
                 <button class="button" id="reselect-button">다시 선택하기</button>
