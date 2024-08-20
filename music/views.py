@@ -59,8 +59,6 @@
 from django.shortcuts import render, redirect
 from django.conf import settings
 import openai
-import base64
-from google.cloud import vision
 
 def image_upload_page(request):
     if request.method == 'POST':
@@ -90,27 +88,23 @@ def image_upload_page(request):
     return render(request, 'music/image_upload_page.html')
 
 
-def generate_image_caption(image_content):
-    """
-    이 함수는 OpenAI GPT를 사용해 사용자가 업로드한 이미지에 대한 설명을 생성합니다.
-    이 경우 이미지를 직접 분석하지 않고, 텍스트로만 작업을 수행합니다.
-    """
-    # OpenAI GPT API 호출
-    openai.api_key = settings.OPENAI_API_KEY
+# def generate_image_caption(image_content):
+    # # OpenAI GPT API 호출
+    # openai.api_key = settings.OPENAI_API_KEY
 
-    # 이미지를 기반으로 GPT에게 단순히 이미지 설명을 요청
-    prompt = "이 이미지는 무엇을 표현하는지 설명해 주세요."
-
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "이미지 설명 생성."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=150
-    )
-
-    return response['choices'][0]['message']['content'].strip()
+    # # 이미지를 기반으로 GPT에게 단순히 이미지 설명을 요청
+    # prompt = "이 이미지는 무엇을 표현하는지 설명해 주세요."
+    #
+    # response = openai.ChatCompletion.create(
+    #     model="gpt-4",
+    #     messages=[
+    #         {"role": "system", "content": "이미지 설명 생성."},
+    #         {"role": "user", "content": prompt}
+    #     ],
+    #     max_tokens=150
+    # )
+    #
+    # return response['choices'][0]['message']['content'].strip()
 
 
 def result_page(request):
