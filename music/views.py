@@ -58,6 +58,8 @@
 
 from django.shortcuts import render, redirect
 from django.conf import settings
+import requests
+import base64
 import openai
 
 def image_upload_page(request):
@@ -88,23 +90,45 @@ def image_upload_page(request):
     return render(request, 'music/image_upload_page.html')
 
 
-# def generate_image_caption(image_content):
-    # # OpenAI GPT API 호출
-    # openai.api_key = settings.OPENAI_API_KEY
+# 이미지 캡셔닝 생성 함수
+def generate_image_caption(image_content):
+    # 이미지를 base64로 인코딩
+    base64_image = base64.b64encode(image_content).decode('utf-8')
 
-    # # 이미지를 기반으로 GPT에게 단순히 이미지 설명을 요청
-    # prompt = "이 이미지는 무엇을 표현하는지 설명해 주세요."
-    #
-    # response = openai.ChatCompletion.create(
-    #     model="gpt-4",
-    #     messages=[
-    #         {"role": "system", "content": "이미지 설명 생성."},
-    #         {"role": "user", "content": prompt}
-    #     ],
-    #     max_tokens=150
-    # )
-    #
-    # return response['choices'][0]['message']['content'].strip()
+    # OpenAI API 키 설정
+    api_key = settings.OPENAI_API_KEY
+
+    # OpenAI API 요청 헤더
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+
+    # OpenAI API 요청 페이로드
+    payload = {
+        "model": "gpt-4o-mini",  # 적절한 모델을 사용하세요
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "Describe this image"},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
+                ]
+            }
+        ],
+        "max_tokens": 100
+    }
+
+    # OpenAI API 요청
+    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+
+    # 응답 확인 및 처리
+    if response.status_code == 200:
+        return response.json()["choices"][0]["message"]["content"]
+    else:
+        return "이미지 설명 생성 중 오류 발생"
+
+
 
 
 def result_page(request):

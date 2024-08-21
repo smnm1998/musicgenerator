@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = 'django-insecure-s0o2jzdy#nizj)c3(j*2bs#bzc_2a5c@fq+3%g3yw_()t6p@in'
 SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
@@ -118,7 +118,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # collectstatic으로 파�
 # GCS를 사용할 경우, `DEBUG=False` 상태에서만 적용
 if not DEBUG:
     STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-    STATIC_BUCKET_NAME = os.environ.get('STATIC_BUCKET_NAME', 'andong-24-team-101-staticfiles')
+    # STATIC_BUCKET_NAME = os.environ.get('STATIC_BUCKET_NAME', 'andong-24-team-101-staticfiles')
+    STATIC_BUCKET_NAME = 'andong-24-team-101-staticfiles'
     STATIC_URL = f'https://storage.googleapis.com/{STATIC_BUCKET_NAME}/static/'
 
 # 미디어 파일(업로드 파일)용 버킷 설정
@@ -136,6 +137,6 @@ else:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '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')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', 'sk-eq9bPDW6Rs8BoOq0hPNRUnRdf88KJDtCuryo5vXE59T3BlbkFJQZhCWQwt9D_mIMCEnNX5JmzqxOBpJd1-CknVGQoLoA')
 
 # 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
