@@ -2,7 +2,6 @@
 .header-container {
     margin: 0 auto;
     padding: 10px 20px;
-    padding-top: 30px;
     border-bottom: 1px solid black;
 }
 
@@ -21,117 +20,201 @@
     font-weight: bold;
 }
 
-/*----- introduce -----*/
+/* 소개 섹션 스타일 */
 .introduce-container {
-    margin: 0 auto;
+    margin: 20px auto;
     padding: 10px 80px;
+    text-align: center;
 }
 
-/*----- albumart -----*/
+/* 앨범 아트 섹션 스타일 */
 .albumart-container {
-    margin: 20px auto; /* 상하 여백 추가 */
-    width: 600px;
-    height: 600px;
+    margin: 0 auto;
+    margin-top: 70px;
+    width: 300px;
+    height: 300px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid black;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
-    background-color: #f5f5f5; /* 앨범아트 배경색 추가 */
+    border-radius: 50%; /* 동그랗게 만듦 */
+    overflow: hidden; /* 원 밖으로 나가는 이미지 숨김 */
+    position: relative;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.0) 70%), /* 중심에서 퍼지는 그림자 */
+                linear-gradient(145deg, #d4d4d4, #f0f0f0); /* CD의 기본 배경 그라데이션 */
+    box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.3); /* 전체적으로 퍼지는 그림자 */
 }
 
-/* Album Art Wrapper */
 .albumart-wrapper {
     width: 100%;
     height: 100%;
     position: relative;
     text-align: center;
+    border-radius: 50%; /* 동그랗게 만듦 */
+    background: radial-gradient(circle, #ffffff 0%, #d4d4d4 70%, #c0c0c0 100%); /* CD의 반사 느낌을 주는 그라데이션 */
 }
 
 .albumart-wrapper img {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* 이미지가 박스에 꽉 차도록 설정 */
+    object-fit: cover; /* 이미지가 원 안에 꽉 차도록 설정 */
+    border-radius: 50%; /* 이미지를 동그랗게 */
+    animation: spin 7.5s linear infinite; /* 회전 애니메이션 추가 */
 }
 
-/*----- Audio Player -----*/
-.audio-player-container {
-    margin: 20px auto;
+/* 작은 구멍 */
+.albumart-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px; /* 작은 구멍의 지름 설정 */
+    height: 40px;
+    background-color: #f0f0f0; /* 작은 구멍의 색상 */
+    border-radius: 50%; /* 구멍을 동그랗게 만듦 */
+    transform: translate(-50%, -50%);
+    z-index: 2; /* 가장 앞에 위치하도록 */
+    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.2), /* 입체감을 위한 내측 그림자 */
+                inset -4px -4px 8px rgba(255, 255, 255, 0.7);
+}
+
+/* 큰 구멍 */
+.albumart-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 70px; /* 큰 구멍의 지름 설정 */
+    height: 70px;
+    background-color: #d4d4d4; /* 큰 구멍의 색상 */
+    border-radius: 50%; /* 구멍을 동그랗게 만듦 */
+    transform: translate(-50%, -50%);
+    z-index: 1; /* 작은 구멍보다 뒤에 위치하도록 */
+    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.2), /* 입체감을 위한 내측 그림자 */
+                inset -4px -4px 8px rgba(255, 255, 255, 0.7);
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* Song Info */
+.info {
+    margin: 1.5rem 0;
     text-align: center;
-    padding: 20px; /* 패딩 추가 */
-    background-color: #f5f5f5; /* 배경색 추가 */
-    border-radius: 15px; /* 모서리를 둥글게 */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 약간의 그림자 추가 */
-    max-width: 650px; /* 최대 너비 설정 */
 }
 
-#audio-player {
-    width: 100%; /* 플레이어가 컨테이너 너비에 맞게 */
-    height: 50px; /* 높이를 조정하여 플레이어를 더 크고 눈에 띄게 */
-    border: none; /* 기본 테두리 제거 */
-    background-color: #eaeaea; /* 플레이어 배경색 설정 */
-    border-radius: 10px; /* 플레이어 모서리를 둥글게 */
-    outline: none; /* 포커스 시 아웃라인 제거 */
-    box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1); /* 내부 그림자 추가 */
+.info h1 {
+    color: var(--black);
+    font-weight: 500;
+    font-size: 1.5rem;  /* 제목을 더 크게 */
+    margin-bottom: 0.5rem;
 }
 
-/* 플레이어의 커스텀 컨트롤 (브라우저마다 다를 수 있음) */
-#audio-player::-webkit-media-controls-panel {
-    background-color: #eaeaea;
-    border-radius: 5px;
+.info p {
+    font-size: 1.15rem;
+    color: var(--prog);
+    margin-top: 0.25rem;
 }
 
-#audio-player::-webkit-media-controls-play-button,
-#audio-player::-webkit-media-controls-pause-button,
-#audio-player::-webkit-media-controls-volume-slider {
-    filter: brightness(1.5); /* 버튼과 슬라이더를 더 밝게 */
+/* Progress Bar */
+.prog {
+    padding: 10px 40px;
+    margin: 1rem auto;
+    max-width: 600px;
 }
 
-#audio-player::-webkit-media-controls-current-time-display,
-#audio-player::-webkit-media-controls-time-remaining-display {
-    color: #333; /* 시간 표시 텍스트 색상 변경 */
+.prog-time {
+    padding: 3px 5px;
+    color: var(--prog);
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
 }
 
-/*----- Lyrics Section -----*/
-.lyrics-container {
-    margin: 20px auto;
-    padding: 10px 80px;
-    text-align: center;
+.prog-time > p {
+    font-size: 0.75rem;  /* 시간을 더 잘 보이게 */
 }
 
-.lyrics-wrapper {
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex; /* 가사를 중앙에 정렬하기 위해 flexbox 사용 */
-    align-items: center; /* 수직 중앙 정렬 */
-    justify-content: center; /* 수평 중앙 정렬 */
-    min-height: 200px; /* 가사 박스 최소 높이 설정 */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 가사 부분에 그림자 추가 */
+.prog-bar {
+    width: 100%;
+    height: 10px;
+    padding: 1px;
+    border-radius: 25px;
+    background: linear-gradient(145deg, #fbfbfb, #d4d4d4);
+    box-shadow: 5px 5px 10px #a5a5a5,
+                -5px -5px 10px #ffffff;
 }
 
-#lyrics-content {
-    font-size: 18px;
-    color: #333;
-    text-align: center; /* 가사 텍스트 자체를 중앙 정렬 */
-    display: inline-block; /* 텍스트 블록을 중앙에 정렬 */
+.prog-bar-inner {
+    height: 8px;
+    background: var(--prog);
+    border-radius: 25px;
+    animation: timer 30s linear;  /* 30초 동안 진행바가 채워지는 애니메이션 */
 }
 
-/*----- footer -----*/
+/* Player Buttons */
+.buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* 버튼 간격 */
+}
+
+.button {
+    width: 50px; /* 버튼 크기 */
+    height: 50px;
+    border-radius: 50%; /* 원형 버튼 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem; /* 아이콘 크기 */
+    background-color: #f0f0f0; /* 배경색 */
+    border: none; /* 테두리 제거 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 입체감을 위한 그림자 */
+    cursor: pointer; /* 커서를 포인터로 변경 */
+    transition: background-color 0.3s, transform 0.2s; /* 배경색과 크기 변화 트랜지션 */
+}
+
+.button-sm {
+    width: 40px; /* 작은 버튼 크기 */
+    height: 40px;
+    font-size: 1.25rem; /* 작은 버튼 아이콘 크기 */
+}
+
+.button-lg {
+    width: 60px; /* 큰 버튼 크기 */
+    height: 60px;
+    font-size: 1.75rem; /* 큰 버튼 아이콘 크기 */
+}
+
+.button:active {
+    transform: scale(0.9); /* 클릭 시 크기 줄어듦 */
+}
+
+.button:hover {
+    background-color: #e0e0e0; /* 호버 시 배경색 변화 */
+}
+
+
+/* 푸터 스타일 */
 .footer-container {
-    background-color: #AEAEAE; /* 배경색을 어두운 색으로 설정 */
-    text-align: center; /* 텍스트를 중앙 정렬 */
-    padding: 20px 0; /* 위아래 여백 추가 */
+    background-color: #AEAEAE;
+    text-align: center;
+    padding: 25px 0;
+    margin-top: 52px;
 }
 
 .footer-container p {
     color: red;
-    margin: 0; /* 기본 마진 제거 */
-    font-size: 16px; /* 텍스트 크기 설정 */
+    margin: 0;
+    font-size: 16px;
 }
 
 .footer-container .footer-span-1 {
@@ -146,36 +229,10 @@
     color: black;
 }
 
-/*----- Responsive Design -----*/
 @media (max-width: 768px) {
-    /* Header */
     .header-wrapper img {
         padding-top: 30px;
         width: 80px;
         height: 80px;
-    }
-
-    .header-wrapper span {
-        font-size: 24px;
-    }
-
-    /* Audio Player */
-    #audio-player {
-        width: 100%;
-    }
-
-    /* Lyrics Section */
-    .lyrics-container {
-        padding: 10px 20px;
-    }
-
-    .lyrics-wrapper {
-        max-width: 100%;
-        padding: 15px;
-    }
-
-    /* Footer */
-    .footer-container {
-        font-size: 14px; /* 폰트 크기를 줄여서 작은 화면에서 잘 보이게 */
     }
 }

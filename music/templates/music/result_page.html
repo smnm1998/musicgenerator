@@ -107,20 +107,35 @@
         </header>
     </div>
 
-    <div>
-        <div class="introduce-container">
-            <h1>앨범아트</h1>
-        </div>
-    </div>
-
     <div class="albumart-container">
         <div class="albumart-wrapper">
             {% if image_data %}
                 <img id="albumart-image" src="data:image/jpeg;base64,{{ image_data|safe }}" alt="업로드된 앨범아트">
-                <p>{{ image_description }}</p>
+                <p style="display: none">{{ image_description }}</p>
             {% else %}
                 <p>이미지가 없습니다.</p>
             {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="info">
+            <h1>Song Title</h1>
+            <p>Artist Name</p>
+        </div>
+        <div class="prog">
+            <div class="prog-time">
+                <p>0:00</p>
+                <p>3:45</p>
+            </div>
+            <div class="prog-bar">
+                <div class="prog-bar-inner"></div>
+            </div>
+        </div>
+        <div class="buttons">
+            <button id="prev-button" class="button button-sm">◀</button>
+            <button id="play-pause-button" class="button button-lg">❚❚</button>
+            <button id="next-button" class="button button-sm">▶</button>
         </div>
     </div>
 

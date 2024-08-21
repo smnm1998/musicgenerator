@@ -2,7 +2,6 @@
 .header-container {
     margin: 0 auto;
     padding: 10px 20px;
-    padding-top: 30px;
     border-bottom: 1px solid black;
 }
 
@@ -129,7 +128,7 @@
 .footer-container {
     background-color: #AEAEAE; /* 배경색을 어두운 색으로 설정 */
     text-align: center; /* 텍스트를 중앙 정렬 */
-    padding: 20px 0; /* 위아래 여백 추가 */
+    padding: 25px 0; /* 위아래 여백 추가 */
 }
 
 .footer-container p {
