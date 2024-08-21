@@ -125,19 +125,28 @@
         </div>
         <div class="prog">
             <div class="prog-time">
-                <p>0:00</p>
-                <p>3:45</p>
+                <p id="current-time">0:00</p>
+                <p id="total-duration">-:--</p>
             </div>
             <div class="prog-bar">
                 <div class="prog-bar-inner"></div>
             </div>
         </div>
         <div class="buttons">
-            <button id="prev-button" class="button button-sm">◀</button>
-            <button id="play-pause-button" class="button button-lg">❚❚</button>
-            <button id="next-button" class="button button-sm">▶</button>
+            <button id="prev-button" class="button button-sm">◁</button>
+            <button id="play-pause-button" class="button button-lg">▶</button>
+            <button id="next-button" class="button button-sm">▷</button>
         </div>
     </div>
+
+    <div class="introduce-container download-section">
+        <h1>평가</h1>
+        <p>노래가 마음에 드셨다면 친구들에게 공유해보세요!</p>
+        <a href="#" download="song.mp3" class="download-button">
+            음원 다운로드
+        </a>
+    </div>
+
 
     <div class="footer-container">
         <footer>
@@ -155,6 +164,7 @@
             </p>
         </footer>
     </div>
+{#    <audio id="audio-player" src="{% static 'music/images/omg.mp3' %}"></audio>#}
     <script src="{% static 'music/js/result_page.js' %}"></script>
 </body>
 </html>
