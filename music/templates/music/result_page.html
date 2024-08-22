@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en&ko-KR">
 <head>
@@ -34,6 +35,13 @@
 
     <div class="audio-player-container">
         {% if music_file %}
+        <!-- 음악 자동 재생을 위한 audio 태그 -->
+        <audio id="audio-player" controls autoplay>
+            <source src="{{ music_file }}" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+
+        <!-- 재생/정지 및 타임라인 컨트롤 -->
         <div class="prog">
             <div class="prog-time">
                 <p id="current-time">0:00</p>
@@ -44,18 +52,17 @@
             </div>
         </div>
         <div class="buttons">
-            <button id="prev-button" class="button button-sm">◁</button>
-            <button id="play-pause-button" class="button button-lg">▶</button>
-            <button id="next-button" class="button button-sm">▷</button>
+            <button id="play-pause-button" class="button button-lg">❚❚</button> <!-- 일시 정지 버튼 -->
         </div>
-    </div>
 
-    <div class="introduce-container download-section">
-        <h1>평가</h1>
-        <p>노래가 마음에 드셨다면 친구들에게 공유해보세요!</p>
-        <a href="{{ music_file }}" download="generated_music.wav" class="download-button">
-            음원 다운로드
-        </a>
+        <!-- 다운로드 버튼 -->
+        <div class="introduce-container download-section">
+            <h1>평가</h1>
+            <p>노래가 마음에 드셨다면 친구들에게 공유해보세요!</p>
+            <a href="{{ music_file }}" download="generated_music.wav" class="download-button">
+                음원 다운로드
+            </a>
+        </div>
         {% else %}
         <p>음악 파일을 찾을 수 없습니다.</p>
         {% endif %}
@@ -77,9 +84,7 @@
             </p>
         </footer>
     </div>
+
     <script src="{% static 'music/js/result_page.js' %}"></script>
 </body>
 </html>
-
-
-

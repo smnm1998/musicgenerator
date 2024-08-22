@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 import requests
 import base64
+import uuid
 import openai
 
 from google.cloud import aiplatform
@@ -59,8 +60,8 @@ def image_upload_page(request):
 
         # 파이프라인 실행: 캡셔닝된 텍스트를 user_prompt로 전달
         try:
-            pipeline_job_name = run_music_generation_pipeline(image_description)
-            request.session['pipeline_job_name'] = pipeline_job_name
+            unique_filename = run_music_generation_pipeline(image_description)
+            request.session['unique_filename'] = unique_filename  # 고유 파일 이름 세션에 저장
         except Exception as e:
             request.session['pipeline_error'] = "파이프라인 실행 중 오류 발생: " + str(e)
 
@@ -92,7 +93,7 @@ def generate_image_caption(image_content):
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": "Describe this image"},
+                    {"type": "text", "text": "A detailed portrait of a person standing in a serene outdoor environment. The individual is wearing a casual outfit with a comfortable sweater and jeans, conveying a relaxed and approachable demeanor. They have short, neatly styled brown hair and are smiling warmly, with their eyes showing kindness and a hint of curiosity. Their posture is confident yet relaxed, with one hand casually resting in their pocket. The background features a soft, blurred landscape, emphasizing the focus on the person and their friendly expression."},
                     {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
                 ]
             }
@@ -115,6 +116,9 @@ def run_music_generation_pipeline(caption_text):
     # Vertex AI 초기화
     aiplatform.init(project='andong-24-team-101', location='asia-northeast3')
 
+    # 고유 파일 이름 생성 (UUID 사용)
+    unique_filename = f"New_{uuid.uuid4()}.wav"
+
     # 파이프라인 제출
     pipeline_job = aiplatform.PipelineJob(
         display_name="music-generation-pipeline",
@@ -127,14 +131,15 @@ def run_music_generation_pipeline(caption_text):
             "project": "andong-24-team-101",
             "region": "asia-northeast3",
             "gcs_bucket_name": "test_music_team_101",  # GCS 버킷 이름
-            "gcs_output_path": "test_wav/New.wav"  # 버킷 내 파일을 저장할 경로
+            "gcs_output_path": f"test_wav/{unique_filename}"  # f-string 사용하여 고유 파일 이름 삽입
         }
     )
 
     # 파이프라인 실행
     pipeline_job.submit()
 
-    return pipeline_job.name  # 파이프라인 Job 이름 반환
+    return unique_filename  # 고유 파일 이름 반환
+
 
 def get_gcs_file_url(bucket_name, file_path):
     # GCS 클라이언트 생성
@@ -149,14 +154,16 @@ def get_gcs_file_url(bucket_name, file_path):
     else:
         return None
 
+
 def result_page(request):
-    # 세션에서 이미지와 설명 가져오기
+    # 세션에서 이미지와 설명, 고유 파일 이름 가져오기
     image_data = request.session.get('image_data')
     image_description = request.session.get('image_description')
+    unique_filename = request.session.get('unique_filename')  # 고유 파일 이름
 
     # 파이프라인에서 생성된 음악 파일 경로
     gcs_bucket_name = "test_music_team_101"
-    gcs_file_path = "test_wav/New.wav"
+    gcs_file_path = f"test_wav/{unique_filename}"
 
     # GCS 파일 URL 가져오기
     music_file_url = get_gcs_file_url(gcs_bucket_name, gcs_file_path)
