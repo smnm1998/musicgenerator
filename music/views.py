@@ -1,61 +1,3 @@
-# from django.shortcuts import render, redirect
-# from google.cloud import storage
-# from django.conf import settings
-# import openai
-# import base64
-#
-# def image_upload_page(request):
-#     if request.method == 'POST':
-#         # 사용자가 업로드한 이미지 파일을 가져옴
-#         image = request.FILES['image']
-#
-#         # 이미지 파일을 메모리에서 처리 (저장하지 않음)
-#         image_content = image.read()
-#
-#         # 이미지 데이터를 Base64 형식으로 인코딩
-#         encoded_image = base64.b64encode(image_content).decode('utf-8')
-#
-#         # OpenAI GPT로 이미지에 대한 캡셔닝 문구 생성
-#         try:
-#             image_description = generate_image_caption()
-#         except Exception as e:
-#             image_description = "이미지 설명 생성 중 오류 발생: " + str(e)
-#
-#         # 세션에 이미지와 설명을 저장
-#         request.session['image_data'] = encoded_image
-#         request.session['image_description'] = image_description
-#
-#         # 결과 페이지로 리디렉션
-#         return redirect('result_page')
-#
-#     # GET 요청 시 업로드 폼 표시
-#     return render(request, 'music/image_upload_page.html')
-#
-# def generate_image_caption(image_content):
-#     openai.api_key = settings.OPENAI_API_KEY
-#
-#     # GPT-3에 대한 설명 요청
-#     prompt = "이 이미지에 대한 설명을 제공해주세요."
-#     response = openai.Completion.create(
-#         engine="text-davinci-003",
-#         prompt=prompt,
-#         max_tokens=100
-#     )
-#     return response.choices[0].text.strip()
-#
-#
-# # 결과 페이지 뷰
-# def result_page(request):
-#     # 세션에서 이미지와 설명 가져오기
-#     image_data = request.session.get('image_data')
-#     image_description = request.session.get('image_description')
-#
-#     return render(request, 'music/result_page.html', {
-#         'image_data': image_data,
-#         'image_description': image_description,
-#     })
-#
-
 from django.shortcuts import render, redirect
 from django.conf import settings
 import requests
@@ -70,6 +12,33 @@ import time
 from google.cloud import storage
 
 # 이미지 업로드 함수 -----------------------------
+# def image_upload_page(request):
+#     if request.method == 'POST':
+#         # 사용자가 업로드한 이미지 파일을 가져옴
+#         image = request.FILES['image']
+#
+#         # 이미지 파일을 메모리에서 처리 (저장하지 않음)
+#         image_content = image.read()
+#
+#         # 이미지 데이터를 Base64 형식으로 인코딩
+#         encoded_image = base64.b64encode(image_content).decode('utf-8')
+#
+#         # OpenAI GPT로 이미지에 대한 캡셔닝 문구 생성
+#         try:
+#             image_description = generate_image_caption(image_content)  # image_content 전달
+#         except Exception as e:
+#             image_description = "이미지 설명 생성 중 오류 발생: " + str(e)
+#
+#         # 세션에 이미지와 설명을 저장
+#         request.session['image_data'] = encoded_image
+#         request.session['image_description'] = image_description
+#
+#         # 결과 페이지로 리디렉션
+#         return redirect('result_page')
+#
+#     # GET 요청 시 업로드 폼 표시
+#     return render(request, 'music/image_upload_page.html')
+
 def image_upload_page(request):
     if request.method == 'POST':
         # 사용자가 업로드한 이미지 파일을 가져옴
@@ -78,9 +47,6 @@ def image_upload_page(request):
         # 이미지 파일을 메모리에서 처리 (저장하지 않음)
         image_content = image.read()
 
-        # 이미지 데이터를 Base64 형식으로 인코딩
-        encoded_image = base64.b64encode(image_content).decode('utf-8')
-
         # OpenAI GPT로 이미지에 대한 캡셔닝 문구 생성
         try:
             image_description = generate_image_caption(image_content)  # image_content 전달
@@ -88,8 +54,15 @@ def image_upload_page(request):
             image_description = "이미지 설명 생성 중 오류 발생: " + str(e)
 
         # 세션에 이미지와 설명을 저장
-        request.session['image_data'] = encoded_image
+        request.session['image_data'] = base64.b64encode(image_content).decode('utf-8')
         request.session['image_description'] = image_description
+
+        # 파이프라인 실행: 캡셔닝된 텍스트를 user_prompt로 전달
+        try:
+            pipeline_job_name = run_music_generation_pipeline(image_description)
+            request.session['pipeline_job_name'] = pipeline_job_name
+        except Exception as e:
+            request.session['pipeline_error'] = "파이프라인 실행 중 오류 발생: " + str(e)
 
         # 결과 페이지로 리디렉션
         return redirect('result_page')
@@ -143,16 +116,18 @@ def run_music_generation_pipeline(caption_text):
     aiplatform.init(project='andong-24-team-101', location='asia-northeast3')
 
     # 파이프라인 제출
-    pipeline_job = pipeline_jobs.PipelineJob(
+    pipeline_job = aiplatform.PipelineJob(
         display_name="music-generation-pipeline",
         template_path="music_generation_pipeline.json",
         pipeline_root="gs://test_music_team_101/test_pipeline",
         parameter_values={
-            "initial_prompt": caption_text,  # 캡셔닝된 텍스트를 파이프라인에 전달
-            "user_prompt": "A bit more energetic and uplifting",  # 사용자 정의 프롬프트
+            "initial_prompt": "Input Description of desire for musical expression!",
+            "user_prompt": caption_text,  # 캡셔닝된 텍스트를 user_prompt로 전달
             "endpoint_id": "projects/535442247184/locations/asia-northeast3/endpoints/7748060528844472320",
             "project": "andong-24-team-101",
-            "region": "asia-northeast3"
+            "region": "asia-northeast3",
+            "gcs_bucket_name": "test_music_team_101",  # GCS 버킷 이름
+            "gcs_output_path": "test_wav/New.wav"  # 버킷 내 파일을 저장할 경로
         }
     )
 
@@ -161,41 +136,48 @@ def run_music_generation_pipeline(caption_text):
 
     return pipeline_job.name  # 파이프라인 Job 이름 반환
 
+def get_gcs_file_url(bucket_name, file_path):
+    # GCS 클라이언트 생성
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(file_path)
 
-# 최종 결과 페이지 함수 -----------------------------
+    # 파일이 존재하는지 확인
+    if blob.exists():
+        # GCS 파일 URL 생성
+        return f"https://storage.googleapis.com/{bucket_name}/{file_path}"
+    else:
+        return None
+
 def result_page(request):
     # 세션에서 이미지와 설명 가져오기
     image_data = request.session.get('image_data')
     image_description = request.session.get('image_description')
 
+    # 파이프라인에서 생성된 음악 파일 경로
+    gcs_bucket_name = "test_music_team_101"
+    gcs_file_path = "test_wav/New.wav"
+
+    # GCS 파일 URL 가져오기
+    music_file_url = get_gcs_file_url(gcs_bucket_name, gcs_file_path)
+
     return render(request, 'music/result_page.html', {
         'image_data': image_data,
         'image_description': image_description,
+        'music_file': music_file_url,
     })
 
 
-#
-# def get_music_file_from_gcs(bucket_name, file_name):
-#     client = storage.Client()
-#     bucket = client.bucket(bucket_name)
-#     blob = bucket.blob(file_name)
-#     local_file_path = f"/tmp/{file_name}"
-#     blob.download_to_filename(local_file_path)
-#     return local_file_path
-#
+
+
+
+# # 최종 결과 페이지 함수 -----------------------------
 # def result_page(request):
-#     # 세션에서 캡셔닝된 텍스트 가져오기
+#     # 세션에서 이미지와 설명 가져오기
+#     image_data = request.session.get('image_data')
 #     image_description = request.session.get('image_description')
 #
-#     # Vertex AI 파이프라인 실행
-#     job_name = run_music_generation_pipeline(image_description)
-#
-#     # 파이프라인 완료 대기 (예: 60초 대기)
-#     time.sleep(60)
-#
-#     # GCS에서 음악 파일 다운로드
-#     bucket_name = "test_music_team_101"
-#     music_file_path = get_music_file_from_gcs(bucket_name, "generated_music.wav")
-#
-#     # 음악 파일을 반환
-#     return FileResponse(open(music_file_path, 'rb'), as_attachment=True, filename="generated_music.wav")
+#     return render(request, 'music/result_page.html', {
+#         'image_data': image_data,
+#         'image_description': image_description,
+#     })
