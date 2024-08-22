@@ -1,0 +1,276 @@
+{
+  "components": {
+    "comp-generate-music": {
+      "executorLabel": "exec-generate-music",
+      "inputDefinitions": {
+        "parameters": {
+          "gcs_bucket_name": {
+            "parameterType": "STRING"
+          },
+          "gcs_output_path": {
+            "parameterType": "STRING"
+          },
+          "prompt": {
+            "parameterType": "STRING"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "parameters": {
+          "output_audio": {
+            "parameterType": "STRING"
+          }
+        }
+      }
+    },
+    "comp-interact-with-gemini-model-once": {
+      "executorLabel": "exec-interact-with-gemini-model-once",
+      "inputDefinitions": {
+        "parameters": {
+          "endpoint_id": {
+            "parameterType": "STRING"
+          },
+          "initial_prompt": {
+            "parameterType": "STRING"
+          },
+          "project": {
+            "parameterType": "STRING"
+          },
+          "region": {
+            "parameterType": "STRING"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "parameters": {
+          "Output": {
+            "parameterType": "STRING"
+          }
+        }
+      }
+    },
+    "comp-interact-with-gemini-model-second": {
+      "executorLabel": "exec-interact-with-gemini-model-second",
+      "inputDefinitions": {
+        "parameters": {
+          "endpoint_id": {
+            "parameterType": "STRING"
+          },
+          "previous_response_text": {
+            "parameterType": "STRING"
+          },
+          "project": {
+            "parameterType": "STRING"
+          },
+          "region": {
+            "parameterType": "STRING"
+          },
+          "user_prompt": {
+            "parameterType": "STRING"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "parameters": {
+          "Output": {
+            "parameterType": "STRING"
+          }
+        }
+      }
+    }
+  },
+  "deploymentSpec": {
+    "executors": {
+      "exec-generate-music": {
+        "container": {
+          "args": [
+            "--executor_input",
+            "{{$}}",
+            "--function_to_execute",
+            "generate_music"
+          ],
+          "command": [
+            "sh",
+            "-c",
+            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location 'kfp==2.5.0' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&  python3 -m pip install --quiet --no-warn-script-location 'transformers' 'scipy' 'torch' 'google-cloud-storage' && \"$0\" \"$@\"\n",
+            "sh",
+            "-ec",
+            "program_path=$(mktemp -d)\n\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\n_KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+            "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import *\n\ndef generate_music(prompt: str, output_audio: OutputPath(str), gcs_bucket_name: str, gcs_output_path: str):\n    \"\"\"\n    \ud14d\uc2a4\ud2b8 \ud504\ub86c\ud504\ud2b8\ub97c \uae30\ubc18\uc73c\ub85c \uc74c\uc545\uc744 \uc0dd\uc131\ud558\uace0 WAV \ud30c\uc77c\ub85c \uc800\uc7a5\ud55c \ud6c4 GCS \ubc84\ud0b7\uc5d0 \uc5c5\ub85c\ub4dc\ud569\ub2c8\ub2e4.\n    \"\"\"\n    from transformers import AutoProcessor, MusicgenForConditionalGeneration\n    import torch\n    import scipy.io.wavfile\n    from google.cloud import storage\n    import os\n\n    processor = AutoProcessor.from_pretrained(\"facebook/musicgen-large\")\n    model = MusicgenForConditionalGeneration.from_pretrained(\"facebook/musicgen-large\")\n\n    # Process the prompt\n    inputs = processor(text=[prompt], padding=True, return_tensors=\"pt\")\n\n    # Generate audio\n    with torch.no_grad():\n        audio_values = model.generate(**inputs, guidance_scale=2, max_new_tokens=800)\n\n    sampling_rate = model.config.audio_encoder.sampling_rate\n\n    # Save the generated audio to a WAV file\n    scipy.io.wavfile.write(output_audio, rate=sampling_rate, data=audio_values[0, 0].cpu().numpy())\n\n    # Initialize the GCS client\n    storage_client = storage.Client()\n\n    # Upload the file to the specified GCS bucket\n    bucket = storage_client.bucket(gcs_bucket_name)\n    blob = bucket.blob(gcs_output_path)\n\n    # Upload the local file to the GCS bucket\n    blob.upload_from_filename(output_audio)\n\n    print(f\"File uploaded to {gcs_bucket_name}/{gcs_output_path}\")\n\n"
+          ],
+          "image": "python:3.9"
+        }
+      },
+      "exec-interact-with-gemini-model-once": {
+        "container": {
+          "args": [
+            "--executor_input",
+            "{{$}}",
+            "--function_to_execute",
+            "interact_with_gemini_model_once"
+          ],
+          "command": [
+            "sh",
+            "-c",
+            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location 'google-cloud-aiplatform==1.60.0' 'vertexai==1.43.0' 'kfp==2.5.0' 'click==8.0.0' 'docstring-parser==0.7.3' 'kfp-pipeline-spec==0.2.2' 'kfp-server-api==2.0.0' 'kubernetes==8.0.0' 'requests-toolbelt==0.8.0' 'tabulate==0.8.6' 'urllib3==1.26.16' && \"$0\" \"$@\"\n",
+            "sh",
+            "-ec",
+            "program_path=$(mktemp -d)\n\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\n_KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+            "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import *\n\ndef interact_with_gemini_model_once(\n    initial_prompt: str,\n    project: str,\n    region: str,\n    endpoint_id: str\n) -> str:\n    import vertexai\n    from vertexai.generative_models import GenerativeModel\n\n    # Vertex AI \ucd08\uae30\ud654\n    vertexai.init(project=project, location=region)\n\n    # GenerativeModel\uc744 \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub97c \ud1b5\ud574 \ub85c\ub4dc\n    model = GenerativeModel(endpoint_id)\n\n    # \ucc44\ud305 \uc2dc\uc791\n    chat = model.start_chat()\n\n    # \uccab \ubc88\uc9f8 \ub300\ud654\uc5d0\uc11c \uc751\ub2f5 \uc0dd\uc131\n    response = chat.send_message(initial_prompt)\n\n    # \uc751\ub2f5 \ud14d\uc2a4\ud2b8\ub97c \ubc18\ud658\n    return response.text\n\n"
+          ],
+          "image": "python:3.9"
+        }
+      },
+      "exec-interact-with-gemini-model-second": {
+        "container": {
+          "args": [
+            "--executor_input",
+            "{{$}}",
+            "--function_to_execute",
+            "interact_with_gemini_model_second"
+          ],
+          "command": [
+            "sh",
+            "-c",
+            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location 'google-cloud-aiplatform==1.60.0' 'vertexai==1.43.0' 'kfp==2.5.0' 'click==8.0.0' 'docstring-parser==0.7.3' 'kfp-pipeline-spec==0.2.2' 'kfp-server-api==2.0.0' 'kubernetes==8.0.0' 'requests-toolbelt==0.8.0' 'tabulate==0.8.6' 'urllib3==1.26.16' && \"$0\" \"$@\"\n",
+            "sh",
+            "-ec",
+            "program_path=$(mktemp -d)\n\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\n_KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+            "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import *\n\ndef interact_with_gemini_model_second(\n    previous_response_text: str,\n    user_prompt: str,\n    project: str,\n    region: str,\n    endpoint_id: str\n) -> str:\n    import vertexai\n    from vertexai.generative_models import GenerativeModel\n\n    # Vertex AI \ucd08\uae30\ud654\n    vertexai.init(project=project, location=region)\n\n    # GenerativeModel\uc744 \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub97c \ud1b5\ud574 \ub85c\ub4dc\n    model = GenerativeModel(endpoint_id)\n\n    # \ucc44\ud305 \uc2dc\uc791\n    chat = model.start_chat()\n\n    # \uc774\uc804\uc758 \ub300\ud654 \ub9e5\ub77d\uc744 \uc720\uc9c0\ud558\uba70 \uc0c8\ub85c\uc6b4 \ud504\ub86c\ud504\ud2b8\ub85c \ub300\ud654 \uc774\uc5b4\ub098\uac10\n    combined_prompt = f\"{previous_response_text}\\n\\n{user_prompt}\"\n    response = chat.send_message(combined_prompt)\n\n    # \uc751\ub2f5 \ud14d\uc2a4\ud2b8\ub97c \ubc18\ud658\n    return response.text\n\n"
+          ],
+          "image": "python:3.9"
+        }
+      }
+    }
+  },
+  "pipelineInfo": {
+    "description": "A pipeline to generate music based on two rounds of conversation with Gemini model.",
+    "name": "music-generation-pipeline"
+  },
+  "root": {
+    "dag": {
+      "tasks": {
+        "generate-music": {
+          "cachingOptions": {
+            "enableCache": true
+          },
+          "componentRef": {
+            "name": "comp-generate-music"
+          },
+          "dependentTasks": [
+            "interact-with-gemini-model-second"
+          ],
+          "inputs": {
+            "parameters": {
+              "gcs_bucket_name": {
+                "componentInputParameter": "gcs_bucket_name"
+              },
+              "gcs_output_path": {
+                "componentInputParameter": "gcs_output_path"
+              },
+              "prompt": {
+                "taskOutputParameter": {
+                  "outputParameterKey": "Output",
+                  "producerTask": "interact-with-gemini-model-second"
+                }
+              }
+            }
+          },
+          "taskInfo": {
+            "name": "generate-music"
+          }
+        },
+        "interact-with-gemini-model-once": {
+          "cachingOptions": {
+            "enableCache": true
+          },
+          "componentRef": {
+            "name": "comp-interact-with-gemini-model-once"
+          },
+          "inputs": {
+            "parameters": {
+              "endpoint_id": {
+                "componentInputParameter": "endpoint_id"
+              },
+              "initial_prompt": {
+                "componentInputParameter": "initial_prompt"
+              },
+              "project": {
+                "componentInputParameter": "project"
+              },
+              "region": {
+                "componentInputParameter": "region"
+              }
+            }
+          },
+          "taskInfo": {
+            "name": "interact-with-gemini-model-once"
+          }
+        },
+        "interact-with-gemini-model-second": {
+          "cachingOptions": {
+            "enableCache": true
+          },
+          "componentRef": {
+            "name": "comp-interact-with-gemini-model-second"
+          },
+          "dependentTasks": [
+            "interact-with-gemini-model-once"
+          ],
+          "inputs": {
+            "parameters": {
+              "endpoint_id": {
+                "componentInputParameter": "endpoint_id"
+              },
+              "previous_response_text": {
+                "taskOutputParameter": {
+                  "outputParameterKey": "Output",
+                  "producerTask": "interact-with-gemini-model-once"
+                }
+              },
+              "project": {
+                "componentInputParameter": "project"
+              },
+              "region": {
+                "componentInputParameter": "region"
+              },
+              "user_prompt": {
+                "componentInputParameter": "user_prompt"
+              }
+            }
+          },
+          "taskInfo": {
+            "name": "interact-with-gemini-model-second"
+          }
+        }
+      }
+    },
+    "inputDefinitions": {
+      "parameters": {
+        "endpoint_id": {
+          "parameterType": "STRING"
+        },
+        "gcs_bucket_name": {
+          "parameterType": "STRING"
+        },
+        "gcs_output_path": {
+          "parameterType": "STRING"
+        },
+        "initial_prompt": {
+          "parameterType": "STRING"
+        },
+        "project": {
+          "parameterType": "STRING"
+        },
+        "region": {
+          "parameterType": "STRING"
+        },
+        "user_prompt": {
+          "parameterType": "STRING"
+        }
+      }
+    }
+  },
+  "schemaVersion": "2.1.0",
+  "sdkVersion": "kfp-2.5.0"
+}
