@@ -124,7 +124,8 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
+STATIC_URL = 'https://storage.googleapis.com/andong-24-team-101/static/'
 
 if DEBUG:
     STATICFILES_DIRS = [os.path.join(BASE_DIR, 'music', 'static')]
