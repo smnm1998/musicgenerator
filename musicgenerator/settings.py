@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = 'django-insecure-s0o2jzdy#nizj)c3(j*2bs#bzc_2a5c@fq+3%g3yw_()t6p@in'
 SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 
@@ -124,8 +124,8 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# STATIC_URL = '/static/'
-STATIC_URL = 'https://storage.googleapis.com/andong-24-team-101/static/'
+STATIC_URL = '/static/'
+# STATIC_URL = 'https://storage.googleapis.com/andong-24-team-101/static/'
 
 if DEBUG:
     STATICFILES_DIRS = [os.path.join(BASE_DIR, 'music', 'static')]
@@ -133,8 +133,8 @@ if DEBUG:
 else:
     # GCS를 사용할 경우, `DEBUG=False` 상태에서만 적용
     STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-    STATIC_BUCKET_NAME = os.environ.get('STATIC_BUCKET_NAME', 'andong-24-team-101-staticfiles')
-    STATIC_URL = f'https://storage.googleapis.com/{STATIC_BUCKET_NAME}/static/'
+    STATIC_BUCKET_NAME = os.environ.get('STATIC_BUCKET_NAME', 'test_music_team_101')
+    STATIC_URL = f'https://storage.googleapis.com/{STATIC_BUCKET_NAME}/staticfiles/'
 
     # STATIC_ROOT는 collectstatic이 로컬에서 동작할 때 사용되므로 빈 폴더를 설정
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 여전히 로컬 파일 시스템 경로로 설정
