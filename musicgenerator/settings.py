@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = 'django-insecure-s0o2jzdy#nizj)c3(j*2bs#bzc_2a5c@fq+3%g3yw_()t6p@in'
 SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 
@@ -107,27 +107,44 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+# # Static files (CSS, JavaScript, Images)
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'music', 'static')]
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # collectstatic으로 파일이 수집될 디렉토리
+#
+# # Default primary key field type
+# # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+#
+# # GCS를 사용할 경우, `DEBUG=False` 상태에서만 적용
+# if not DEBUG:
+#     STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+#     # STATIC_BUCKET_NAME = os.environ.get('STATIC_BUCKET_NAME', 'andong-24-team-101-staticfiles')
+#     STATIC_BUCKET_NAME = 'andong-24-team-101-staticfiles'
+#     STATIC_URL = f'https://storage.googleapis.com/{STATIC_BUCKET_NAME}/static/'
+
+
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'music', 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # collectstatic으로 파일이 수집될 디렉토리
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
-# GCS를 사용할 경우, `DEBUG=False` 상태에서만 적용
-if not DEBUG:
+if DEBUG:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'music', 'static')]
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 로컬 파일 시스템 경로
+else:
+    # GCS를 사용할 경우, `DEBUG=False` 상태에서만 적용
     STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-    # STATIC_BUCKET_NAME = os.environ.get('STATIC_BUCKET_NAME', 'andong-24-team-101-staticfiles')
-    STATIC_BUCKET_NAME = 'andong-24-team-101-staticfiles'
+    STATIC_BUCKET_NAME = os.environ.get('STATIC_BUCKET_NAME', 'andong-24-team-101-staticfiles')
     STATIC_URL = f'https://storage.googleapis.com/{STATIC_BUCKET_NAME}/static/'
 
-# 미디어 파일(업로드 파일)용 버킷 설정
-DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-MEDIA_BUCKET_NAME = os.environ.get('MEDIA_BUCKET_NAME', 'test_music_team_101')
-MEDIA_URL = f'https://storage.googleapis.com/{MEDIA_BUCKET_NAME}/test_image/'
+    # STATIC_ROOT는 collectstatic이 로컬에서 동작할 때 사용되므로 빈 폴더를 설정
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 여전히 로컬 파일 시스템 경로로 설정
 
-# 로컬 환경에서는 서비스 계정 키 파일 사용
+
+# # 미디어 파일(업로드 파일)용 버킷 설정 ---------------------------------------------------------
+# DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+# MEDIA_BUCKET_NAME = os.environ.get('MEDIA_BUCKET_NAME', 'test_music_team_101')
+# MEDIA_URL = f'https://storage.googleapis.com/{MEDIA_BUCKET_NAME}/test_image/'
+
+# 로컬 환경에서는 서비스 계정 키 파일 사용 ---------------------------------------------------------
 if os.getenv('GAE_ENV', '').startswith('standard'):
     GS_CREDENTIALS = None  # GCP에서 실행 시 기본 자격 증명을 사용
 else:
