@@ -1,9 +1,13 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
+import threading
+
 from django.conf import settings
 import requests
 import base64
 import uuid
 import openai
+from django.http import JsonResponse
 
 from google.cloud import aiplatform
 from google.cloud.aiplatform import pipeline_jobs
@@ -15,7 +19,7 @@ from google.cloud import storage
 from django.views.decorators.csrf import csrf_exempt
 
 
-# 이미지 업로드 함수 -----------------------------
+# @csrf_exempt
 # def image_upload_page(request):
 #     if request.method == 'POST':
 #         # 사용자가 업로드한 이미지 파일을 가져옴
@@ -24,9 +28,6 @@ from django.views.decorators.csrf import csrf_exempt
 #         # 이미지 파일을 메모리에서 처리 (저장하지 않음)
 #         image_content = image.read()
 #
-#         # 이미지 데이터를 Base64 형식으로 인코딩
-#         encoded_image = base64.b64encode(image_content).decode('utf-8')
-#
 #         # OpenAI GPT로 이미지에 대한 캡셔닝 문구 생성
 #         try:
 #             image_description = generate_image_caption(image_content)  # image_content 전달
@@ -34,8 +35,15 @@ from django.views.decorators.csrf import csrf_exempt
 #             image_description = "이미지 설명 생성 중 오류 발생: " + str(e)
 #
 #         # 세션에 이미지와 설명을 저장
-#         request.session['image_data'] = encoded_image
+#         request.session['image_data'] = base64.b64encode(image_content).decode('utf-8')
 #         request.session['image_description'] = image_description
+#
+#         # 파이프라인 실행: 캡셔닝된 텍스트를 user_prompt로 전달
+#         try:
+#             unique_filename = run_music_generation_pipeline(image_description)
+#             request.session['unique_filename'] = unique_filename  # 고유 파일 이름 세션에 저장
+#         except Exception as e:
+#             request.session['pipeline_error'] = "파이프라인 실행 중 오류 발생: " + str(e)
 #
 #         # 결과 페이지로 리디렉션
 #         return redirect('result_page')
@@ -43,38 +51,34 @@ from django.views.decorators.csrf import csrf_exempt
 #     # GET 요청 시 업로드 폼 표시
 #     return render(request, 'music/image_upload_page.html')
 
-@csrf_exempt
 def image_upload_page(request):
     if request.method == 'POST':
-        # 사용자가 업로드한 이미지 파일을 가져옴
         image = request.FILES['image']
-
-        # 이미지 파일을 메모리에서 처리 (저장하지 않음)
         image_content = image.read()
 
         # OpenAI GPT로 이미지에 대한 캡셔닝 문구 생성
         try:
-            image_description = generate_image_caption(image_content)  # image_content 전달
+            image_description = generate_image_caption(image_content)
         except Exception as e:
             image_description = "이미지 설명 생성 중 오류 발생: " + str(e)
 
-        # 세션에 이미지와 설명을 저장
         request.session['image_data'] = base64.b64encode(image_content).decode('utf-8')
         request.session['image_description'] = image_description
 
-        # 파이프라인 실행: 캡셔닝된 텍스트를 user_prompt로 전달
         try:
             unique_filename = run_music_generation_pipeline(image_description)
-            request.session['unique_filename'] = unique_filename  # 고유 파일 이름 세션에 저장
+            request.session['unique_filename'] = unique_filename
+
+            # 파이프라인 상태 확인을 백그라운드에서 실행
+            threading.Thread(target=check_pipeline_completion, args=(unique_filename, request)).start()
+
+            # 로딩 페이지로 리디렉션
+            return redirect('loading_page')
         except Exception as e:
             request.session['pipeline_error'] = "파이프라인 실행 중 오류 발생: " + str(e)
+            return redirect('error_page')
 
-        # 결과 페이지로 리디렉션
-        return redirect('result_page')
-
-    # GET 요청 시 업로드 폼 표시
     return render(request, 'music/image_upload_page.html')
-
 
 # 이미지 캡셔닝 생성 함수 -----------------------------
 def generate_image_caption(image_content):
@@ -141,8 +145,38 @@ def run_music_generation_pipeline(caption_text):
 
     # 파이프라인 실행
     pipeline_job.submit()
-
     return unique_filename  # 고유 파일 이름 반환
+
+
+def check_pipeline_completion(unique_filename, request):
+    gcs_bucket_name = "test_music_team_101"
+    gcs_file_path = f"test_wav/{unique_filename}"
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(gcs_bucket_name)
+    blob = bucket.blob(gcs_file_path)
+
+    while not blob.exists():
+        time.sleep(10)
+
+    request.session['pipeline_completed'] = True
+
+
+def check_pipeline_status(request):
+    if request.session.get('pipeline_completed'):
+        return JsonResponse({'pipeline_completed': True})
+    elif request.session.get('pipeline_error'):
+        return JsonResponse({'pipeline_error': True})
+    else:
+        return JsonResponse({'pipeline_completed': False})
+
+
+def loading_page(request):
+    if request.session.get('pipeline_completed'):
+        return redirect('result_page')
+    elif request.session.get('pipeline_error'):
+        return redirect('error_page')
+
+    return render(request, 'music/loading_page.html')
 
 
 def get_gcs_file_url(bucket_name, file_path):
@@ -159,24 +193,42 @@ def get_gcs_file_url(bucket_name, file_path):
         return None
 
 
+
 def result_page(request):
-    # 세션에서 이미지와 설명, 고유 파일 이름 가져오기
     image_data = request.session.get('image_data')
     image_description = request.session.get('image_description')
-    unique_filename = request.session.get('unique_filename')  # 고유 파일 이름
-
-    # 파이프라인에서 생성된 음악 파일 경로
-    gcs_bucket_name = "test_music_team_101"
-    gcs_file_path = f"test_wav/{unique_filename}"
+    unique_filename = request.session.get('unique_filename')
 
     # GCS 파일 URL 가져오기
-    music_file_url = get_gcs_file_url(gcs_bucket_name, gcs_file_path)
+    music_file_url = get_gcs_file_url('test_music_team_101', f'test_wav/{unique_filename}')
 
     return render(request, 'music/result_page.html', {
         'image_data': image_data,
         'image_description': image_description,
         'music_file': music_file_url,
     })
+
+
+
+#
+# def result_page(request):
+#     # 세션에서 이미지와 설명, 고유 파일 이름 가져오기
+#     image_data = request.session.get('image_data')
+#     image_description = request.session.get('image_description')
+#     unique_filename = request.session.get('unique_filename')  # 고유 파일 이름
+#
+#     # 파이프라인에서 생성된 음악 파일 경로
+#     gcs_bucket_name = "test_music_team_101"
+#     gcs_file_path = f"test_wav/{unique_filename}"
+#
+#     # GCS 파일 URL 가져오기
+#     music_file_url = get_gcs_file_url(gcs_bucket_name, gcs_file_path)
+#
+#     return render(request, 'music/result_page.html', {
+#         'image_data': image_data,
+#         'image_description': image_description,
+#         'music_file': music_file_url,
+#     })
 
 
 
