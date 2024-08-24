@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <script>
+        function checkStatus() {
+            setInterval(function() {
+                fetch('/check_file_in_gcs/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.file_exists) {
+                        window.location.href = '/result/';  // 결과 페이지로 리디렉션
+                    }
+                });
+            }, 5000);  // 5초마다 체크
+        }
+
+        // 페이지 로드 시 상태 체크 시작
+        window.onload = checkStatus;
+    </script>
+</head>
+<body>
+    <h1>Loading... Please wait.</h1>
+</body>
+</html>

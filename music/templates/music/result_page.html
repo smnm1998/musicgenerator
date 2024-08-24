@@ -1,4 +1,96 @@
-
+{##}
+{##}
+{##}
+{#<!DOCTYPE html>#}
+{#<html lang="en&ko-KR">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>Contents</title>#}
+{#    {% load static %}#}
+{#    <link rel="stylesheet" type="text/css" href="{% static 'music/css/app.css' %}">#}
+{#    <link rel="stylesheet" type="text/css" href="{% static 'music/css/result_page.css' %}">#}
+{#</head>#}
+{#<body>#}
+{#    <div class="header-container">#}
+{#        <header>#}
+{#            <div class="header-wrapper">#}
+{#                <a href="{% url 'upload_image_page' %}">#}
+{#                    <img src="{% static 'music/images/gcp_logo.svg' %}" alt="logo">#}
+{#                </a>#}
+{##}
+{#            </div>#}
+{#        </header>#}
+{#    </div>#}
+{##}
+{#    <div class="albumart-container">#}
+{#        <div class="albumart-wrapper">#}
+{#            {% if image_data %}#}
+{#                <img id="albumart-image" src="data:image/jpeg;base64,{{ image_data|safe }}" alt="업로드된 앨범아트">#}
+{#                <p style="display: none">{{ image_description }}</p>#}
+{#            {% else %}#}
+{#                <p>이미지가 없습니다.</p>#}
+{#            {% endif %}#}
+{#        </div>#}
+{#    </div>#}
+{##}
+{#    <div class="audio-player-container">#}
+{#        {% if music_file %}#}
+{#        <!-- 음악 자동 재생을 위한 audio 태그 -->#}
+{#        <audio id="audio-player" controls autoplay style="display: none;">#}
+{#            <source src="{{ music_file }}" type="audio/wav">#}
+{#            Your browser does not support the audio element.#}
+{#        </audio>#}
+{##}
+{#        <!-- 재생/정지 및 타임라인 컨트롤 -->#}
+{#        <div class="prog">#}
+{#            <div class="prog-time">#}
+{#                <p id="current-time">0:00</p>#}
+{#                <p id="total-duration">-:--</p>#}
+{#            </div>#}
+{#            <div class="prog-bar">#}
+{#                <div class="prog-bar-inner"></div>#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="buttons">#}
+{#            <button id="prev-button" class="button button-sm">◁</button>#}
+{#            <button id="play-pause-button" class="button button-lg">▶</button>#}
+{#            <button id="next-button" class="button button-sm">▷</button>#}
+{#        </div>#}
+{##}
+{#        <!-- 다운로드 버튼 -->#}
+{#        <div class="introduce-container download-section">#}
+{#            <h1>평가</h1>#}
+{#            <p>노래가 마음에 드셨다면 친구들에게 공유해보세요!</p>#}
+{#            <a href="{{ music_file }}" download="generated_music.wav" class="download-button">#}
+{#                음원 다운로드#}
+{#            </a>#}
+{#        </div>#}
+{#        {% else %}#}
+{#        <p style="text-align: center;">음악을 생성 중입니다...</p>#}
+{#        {% endif %}#}
+{#    </div>#}
+{##}
+{#    <div class="footer-container">#}
+{#        <footer>#}
+{#            <p>#}
+{#                Google#}
+{#                <span class="footer-span-1">#}
+{#                    Cloud#}
+{#                </span>#}
+{#                <span class="footer-span-2">#}
+{#                    Platform#}
+{#                </span><br>#}
+{#                <span>#}
+{#                    Andong National University#}
+{#                </span>#}
+{#            </p>#}
+{#        </footer>#}
+{#    </div>#}
+{##}
+{#    <script src="{% static 'music/js/result_page.js' %}"></script>#}
+{#</body>#}
+{#</html>#}
 
 
 <!DOCTYPE html>
@@ -18,15 +110,14 @@
                 <a href="{% url 'upload_image_page' %}">
                     <img src="{% static 'music/images/gcp_logo.svg' %}" alt="logo">
                 </a>
-
             </div>
         </header>
     </div>
 
     <div class="albumart-container">
         <div class="albumart-wrapper">
-            {% if image_data %}
-                <img id="albumart-image" src="data:image/jpeg;base64,{{ image_data|safe }}" alt="업로드된 앨범아트">
+            {% if image_url %}
+                <img id="albumart-image" src="{{ image_url }}" alt="업로드된 앨범아트">
                 <p style="display: none">{{ image_description }}</p>
             {% else %}
                 <p>이미지가 없습니다.</p>
@@ -37,7 +128,7 @@
     <div class="audio-player-container">
         {% if music_file %}
         <!-- 음악 자동 재생을 위한 audio 태그 -->
-        <audio id="audio-player" controls autoplay style="display: none;">
+        <audio id="audio-player" controls autoplay>
             <source src="{{ music_file }}" type="audio/wav">
             Your browser does not support the audio element.
         </audio>
@@ -67,7 +158,9 @@
             </a>
         </div>
         {% else %}
-        <p style="text-align: center;">음악을 생성 중입니다...</p>
+        <div class="loading-message">
+            <p>음악을 생성 중입니다...</p>
+        </div>
         {% endif %}
     </div>
 
@@ -75,15 +168,9 @@
         <footer>
             <p>
                 Google
-                <span class="footer-span-1">
-                    Cloud
-                </span>
-                <span class="footer-span-2">
-                    Platform
-                </span><br>
-                <span>
-                    Andong National University
-                </span>
+                <span class="footer-span-1">Cloud</span>
+                <span class="footer-span-2">Platform</span><br>
+                <span>Andong National University</span>
             </p>
         </footer>
     </div>
