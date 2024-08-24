@@ -12,6 +12,9 @@ from django.http import FileResponse
 import time
 from google.cloud import storage
 
+from django.views.decorators.csrf import csrf_exempt
+
+
 # 이미지 업로드 함수 -----------------------------
 # def image_upload_page(request):
 #     if request.method == 'POST':
@@ -40,6 +43,7 @@ from google.cloud import storage
 #     # GET 요청 시 업로드 폼 표시
 #     return render(request, 'music/image_upload_page.html')
 
+@csrf_exempt
 def image_upload_page(request):
     if request.method == 'POST':
         # 사용자가 업로드한 이미지 파일을 가져옴
