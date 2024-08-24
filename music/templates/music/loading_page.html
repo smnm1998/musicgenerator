@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading...</title>
+
+    {% load static %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'music/css/app.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'music/css/loading_page.css' %}">
+
+
+</head>
+<body>
+    <div id="load">
+        <img src="{% static 'music/images/loading.gif' %}" alt="loading">
+    </div>
+
     <script>
         function checkStatus() {
             setInterval(function() {
@@ -20,8 +33,5 @@
         // 페이지 로드 시 상태 체크 시작
         window.onload = checkStatus;
     </script>
-</head>
-<body>
-    <h1>Loading... Please wait.</h1>
 </body>
 </html>

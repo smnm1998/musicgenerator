@@ -14,12 +14,8 @@ document.addEventListener("DOMContentLoaded", function() {
         const currentTime = audioPlayer.currentTime;
         const duration = audioPlayer.duration;
 
-        console.log('Current Time:', currentTime);
-        console.log('Duration:', duration);
-
         if (!isNaN(duration)) {
             const progressPercent = (currentTime / duration) * 100;
-            console.log('Progress Percent:', progressPercent);
             progBarInner.style.width = `${progressPercent}%`;
             currentTimeElement.textContent = formatTime(currentTime);
         }

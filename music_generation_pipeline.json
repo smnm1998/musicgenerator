@@ -85,13 +85,13 @@
           "command": [
             "sh",
             "-c",
-            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location 'kfp==2.5.0' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&  python3 -m pip install --quiet --no-warn-script-location 'transformers' 'scipy' 'torch' 'google-cloud-storage' && \"$0\" \"$@\"\n",
+            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location 'kfp==2.5.0' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"$0\" \"$@\"\n",
             "sh",
             "-ec",
             "program_path=$(mktemp -d)\n\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\n_KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
             "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import *\n\ndef generate_music(prompt: str, gcs_bucket_name: str, gcs_output_path: str):\n    \"\"\"\n    \ud14d\uc2a4\ud2b8 \ud504\ub86c\ud504\ud2b8\ub97c \uae30\ubc18\uc73c\ub85c \uc74c\uc545\uc744 \uc0dd\uc131\ud558\uace0 GCS \ubc84\ud0b7\uc5d0 WAV \ud30c\uc77c\ub85c \ubc14\ub85c \uc800\uc7a5\ud569\ub2c8\ub2e4.\n    \"\"\"\n    from transformers import AutoProcessor, MusicgenForConditionalGeneration\n    import torch\n    import scipy.io.wavfile\n    from google.cloud import storage\n    import io\n    import numpy as np\n\n    try:\n        # \ub514\ubc84\uae45 \ub85c\uadf8 \ucd94\uac00\n        print(\"Loading MusicGen model...\")\n\n        processor = AutoProcessor.from_pretrained(\"facebook/musicgen-medium\")\n        model = MusicgenForConditionalGeneration.from_pretrained(\"facebook/musicgen-medium\")\n\n        # Move model to GPU (cuda) if available\n        device = \"cuda\" if torch.cuda.is_available() else \"cpu\"\n        print(f\"Using device: {device}\")\n        model = model.to(device)\n\n        # \ucfe0\ub2e4 \uccb4\ud06c\n        if torch.cuda.is_available():\n            print(f\"CUDA is available. Number of GPUs: {torch.cuda.device_count()}\")\n            print(f\"CUDA Device Name: {torch.cuda.get_device_name(0)}\")\n        else:\n            print(\"CUDA is not available.\")\n\n        # Process the prompt and move inputs to the appropriate device\n        inputs = processor(text=[prompt], padding=True, return_tensors=\"pt\").to(device)\n\n        # Generate audio\n        with torch.no_grad():\n            audio_values = model.generate(**inputs, guidance_scale=2, max_new_tokens=800)\n\n        # Set sampling rate from model configuration\n        sampling_rate = model.config.audio_encoder.sampling_rate\n\n        # Convert audio tensor to CPU and to numpy array\n        audio_data = audio_values[0, 0].cpu().numpy()\n\n        # Convert numpy array to WAV format in memory using BytesIO\n        wav_io = io.BytesIO()\n        scipy.io.wavfile.write(wav_io, rate=sampling_rate, data=audio_data.astype(np.float32))\n\n        # Seek to the beginning of the BytesIO object to prepare for upload\n        wav_io.seek(0)\n\n        # Initialize the Google Cloud Storage client\n        storage_client = storage.Client()\n\n        # Upload the in-memory WAV file to the specified GCS bucket\n        bucket = storage_client.bucket(gcs_bucket_name)\n        blob = bucket.blob(gcs_output_path)\n\n        # Upload the WAV file directly from memory\n        blob.upload_from_file(wav_io, content_type=\"audio/wav\")\n\n        print(f\"File uploaded to {gcs_bucket_name}/{gcs_output_path}\")\n\n    except Exception as e:\n        print(f\"Error during generate_music: {str(e)}\")\n        raise\n\n"
           ],
-          "image": "python:3.9"
+          "image": "gcr.io/andong-24-team-101/custom-pipeline-image"
         }
       },
       "exec-interact-with-gemini-model-once": {
@@ -105,13 +105,13 @@
           "command": [
             "sh",
             "-c",
-            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location 'kfp==2.5.0' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&  python3 -m pip install --quiet --no-warn-script-location 'google-cloud-aiplatform==1.60.0' 'vertexai==1.43.0' && \"$0\" \"$@\"\n",
+            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location 'kfp==2.5.0' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"$0\" \"$@\"\n",
             "sh",
             "-ec",
             "program_path=$(mktemp -d)\n\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\n_KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
             "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import *\n\ndef interact_with_gemini_model_once(\n    initial_prompt: str,\n    project: str,\n    region: str,\n    endpoint_id: str\n) -> str:\n    import vertexai\n    from vertexai.generative_models import GenerativeModel\n\n    # Vertex AI \ucd08\uae30\ud654\n    vertexai.init(project=project, location=region)\n\n    # GenerativeModel\uc744 \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub97c \ud1b5\ud574 \ub85c\ub4dc\n    model = GenerativeModel(endpoint_id)\n\n    # \ucc44\ud305 \uc2dc\uc791\n    chat = model.start_chat()\n\n    # \uccab \ubc88\uc9f8 \ub300\ud654\uc5d0\uc11c \uc751\ub2f5 \uc0dd\uc131\n    response = chat.send_message(initial_prompt)\n\n    # \uc751\ub2f5 \ud14d\uc2a4\ud2b8\ub97c \ubc18\ud658\n    return response.text\n\n"
           ],
-          "image": "python:3.9"
+          "image": "gcr.io/andong-24-team-101/custom-pipeline-image"
         }
       },
       "exec-interact-with-gemini-model-second": {
@@ -125,13 +125,13 @@
           "command": [
             "sh",
             "-c",
-            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location 'kfp==2.5.0' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&  python3 -m pip install --quiet --no-warn-script-location 'google-cloud-aiplatform==1.60.0' 'vertexai==1.43.0' && \"$0\" \"$@\"\n",
+            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location 'kfp==2.5.0' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"$0\" \"$@\"\n",
             "sh",
             "-ec",
             "program_path=$(mktemp -d)\n\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\n_KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
             "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import *\n\ndef interact_with_gemini_model_second(\n    previous_response_text: str,\n    user_prompt: str,\n    project: str,\n    region: str,\n    endpoint_id: str\n) -> str:\n    import vertexai\n    from vertexai.generative_models import GenerativeModel\n\n    # Vertex AI \ucd08\uae30\ud654\n    vertexai.init(project=project, location=region)\n\n    # GenerativeModel\uc744 \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub97c \ud1b5\ud574 \ub85c\ub4dc\n    model = GenerativeModel(endpoint_id)\n\n    # \ucc44\ud305 \uc2dc\uc791\n    chat = model.start_chat()\n\n    # \uc774\uc804\uc758 \ub300\ud654 \ub9e5\ub77d\uc744 \uc720\uc9c0\ud558\uba70 \uc0c8\ub85c\uc6b4 \ud504\ub86c\ud504\ud2b8\ub85c \ub300\ud654 \uc774\uc5b4\ub098\uac10\n    combined_prompt = f\"{previous_response_text}\\n\\n{user_prompt}\"\n    response = chat.send_message(combined_prompt)\n\n    # \uc751\ub2f5 \ud14d\uc2a4\ud2b8\ub97c \ubc18\ud658\n    return response.text\n\n"
           ],
-          "image": "python:3.9"
+          "image": "gcr.io/andong-24-team-101/custom-pipeline-image"
         }
       }
     }

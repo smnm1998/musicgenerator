@@ -128,7 +128,7 @@
     <div class="audio-player-container">
         {% if music_file %}
         <!-- 음악 자동 재생을 위한 audio 태그 -->
-        <audio id="audio-player" controls autoplay>
+        <audio id="audio-player" controls autoplay style="display: none">
             <source src="{{ music_file }}" type="audio/wav">
             Your browser does not support the audio element.
         </audio>
