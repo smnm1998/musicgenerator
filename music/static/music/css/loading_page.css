@@ -1,6 +1,6 @@
 #load {
-    width: 150%;
-    height: 150%;
+    width: 100%;
+    height: 100%;
     top: 0;
     left: 0;
     position: fixed;
@@ -15,7 +15,7 @@
 }
 
 #load > img {
-    width: 20%; /* 이미지 너비를 50%로 설정 */
+    width: 50%; /* 이미지 너비를 50%로 설정 */
     height: auto; /* 이미지 비율을 유지하면서 높이를 자동으로 조절 */
     z-index: 100;
 }
