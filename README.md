@@ -1,6 +1,4 @@
-# google_cloud
-google cloud 
-
+# musicgenerator
 - 요약
     - 사용자가 이미지를 업로드하면 그에 대한 캡셔닝을 자동 생성하여 음악 생성 파이프라인으로 전달하여 사용자 맞춤형 음악을 생성하는 웹 애플리케이션입니다. Django 백엔드와 Google Cloud Platform(GCP)의 Vertex AI 기능을 통해 다수의 사용자가 동시에 접근할 수 있는 안정적인 인공지능 기반 서비스를 제공합니다.
 
