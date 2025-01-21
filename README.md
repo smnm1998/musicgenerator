@@ -115,7 +115,7 @@ Melodify는 사용자가 이미지를 업로드하면 해당 이미지의 분위
 
 
 ## 참고 자료
-- [발표 자료 PDF 보기](./1조_Melodify.pptx.pdf)
+- [발표 자료 PDF 보기](./Melodify.pdf)
 
 ---
 
