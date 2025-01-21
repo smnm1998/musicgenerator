@@ -18,18 +18,11 @@ Melodify는 사용자가 이미지를 업로드하면 해당 이미지의 분위
 </p>
 
 ### 구현 화면
-<div style="display: flex; justify-content: center; gap: 20px;">
-  <div style="text-align: center;">
-    <img src="./portfolio_images/upload_page.png" alt="업로드 페이지" width="30%">
-    <p>업로드 페이지</p>
-   
-  </div>
-  <div style="text-align: center;">
-    <img src="./portfolio_images/result_page.png" alt="결과 페이지" width="30%">
-    <p>결과 페이지</p>
-  
-  </div>
-</div>
+| 업로드 페이지                                                                 | 결과 페이지                                                                 |
+|------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| ![업로드 페이지](./portfolio_images/upload_page.png) | ![결과 페이지](./portfolio_images/result_page.png) |
+| 사용자가 이미지를 업로드하고, 해당 이미지의 음악 생성 작업을 시작할 수 있는 페이지입니다. | 생성된 음악을 실시간으로 재생하고 다운로드할 수 있는 기능을 제공합니다. |
+
 
 ---
     
