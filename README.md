@@ -21,18 +21,21 @@ Melodify는 사용자가 이미지를 업로드하면 해당 이미지의 분위
 <table style="width:100%; text-align:center;">
   <tr>
     <td>
+      <br>
       <p align="center">
         <img src="./portfolio_images/loading_page.png" alt="로딩 페이지" width="40%">
       </p>
         <br><로딩 페이지><br>음악 생성 작업 중 상태를 보여주는 페이지입니다.
     </td>
     <td>
+      <br>
       <p align="center">
         <img src="./portfolio_images/upload_page.png" alt="업로드 페이지" width="40%">
       </p>
         <br><업로드 페이지><br>사용자가 이미지를 업로드하고, 음악 생성 작업을 시작할 수 있는 페이지입니다.
     </td>
     <td>
+      <br>
       <p align="center">
         <img src="./portfolio_images/result_page.png" alt="결과 페이지" width="40%">
       </p> 
